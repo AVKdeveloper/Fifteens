@@ -99,17 +99,17 @@ std::string Position::AStar() const {
 		return ptrFirstPosition->distanceToThisPosition + ptrFirstPosition->estimationOfDistance() >
 			ptrSecondPosition->distanceToThisPosition + ptrSecondPosition->estimationOfDistance();
 	};
-	std::priority_queue<Position*, std::vector<Position*>, decltype(distanceComparator)> Q(distanceComparator);
-	std::list<Position> L; // список для хранения сгенерированных позиций
-	L.push_back(*this);
-	Q.push(&(*L.begin()));
-	std::set<Position> S; // посещенные вершины
+	std::priority_queue<Position*, std::vector<Position*>, decltype(distanceComparator)> queue_of_ptr_positions(distanceComparator);
+	std::list<Position> list_of_generated_positions; // список для хранения сгенерированных позиций
+	list_of_generated_positions.push_back(*this);
+	queue_of_ptr_positions.push(&(*list_of_generated_positions.begin()));
+	std::set<Position> set_of_visited_positions; // посещенные вершины
 	std::string str = "";
-	while (!Q.empty())
+	while (!queue_of_ptr_positions.empty())
 	{
-		Position & currentPos = *Q.top();
-		Q.pop();
-		if (S.find(currentPos) != S.end()) { // если вершина была посещена
+		Position & currentPos = *queue_of_ptr_positions.top();
+		queue_of_ptr_positions.pop();
+		if (set_of_visited_positions.find(currentPos) != set_of_visited_positions.end()) { // если вершина была посещена
 			continue;
 		}
 		if (currentPos.is_solved()) {
@@ -126,34 +126,34 @@ std::string Position::AStar() const {
 		else {
 			if (currentPos.canMoveLeft()) {// можем ли пойти влево 
 				Position newPosition(currentPos, 'L');
-				if (S.find(newPosition) == S.end()) {
-					L.push_back(newPosition);
-					Q.push(&(*(L.rbegin())));
+				if (set_of_visited_positions.find(newPosition) == set_of_visited_positions.end()) {
+					list_of_generated_positions.push_back(newPosition);
+					queue_of_ptr_positions.push(&(*(list_of_generated_positions.rbegin())));
 				}
 			}
 			if (currentPos.canMoveRight()) {// можем ли пойти направо
 				Position newPosition(currentPos, 'R');
-				if (S.find(newPosition) == S.end()) {
-					L.push_back(newPosition);
-					Q.push(&(*(L.rbegin())));
+				if (set_of_visited_positions.find(newPosition) == set_of_visited_positions.end()) {
+					list_of_generated_positions.push_back(newPosition);
+					queue_of_ptr_positions.push(&(*(list_of_generated_positions.rbegin())));
 				}
 			}
 			if (currentPos.canMoveUp()) {// можем ли пойти вверх
 				Position newPosition(currentPos, 'U');
-				if (S.find(newPosition) == S.end()) {
-					L.push_back(newPosition);
-					Q.push(&(*(L.rbegin())));
+				if (set_of_visited_positions.find(newPosition) == set_of_visited_positions.end()) {
+					list_of_generated_positions.push_back(newPosition);
+					queue_of_ptr_positions.push(&(*(list_of_generated_positions.rbegin())));
 				}
 			}
 			if (currentPos.canMoveDown()) {// можем ли мы пойти вниз
 				Position newPosition(currentPos, 'D');
-				if (S.find(newPosition) == S.end()) {
-					L.push_back(newPosition);
-					Q.push(&(*(L.rbegin())));
+				if (set_of_visited_positions.find(newPosition) == set_of_visited_positions.end()) {
+					list_of_generated_positions.push_back(newPosition);
+					queue_of_ptr_positions.push(&(*(list_of_generated_positions.rbegin())));
 				}
 			}
 		}
-		S.insert(currentPos);
+		set_of_visited_positions.insert(currentPos);
 	}
 	return str;
 }
